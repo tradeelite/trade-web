@@ -1,0 +1,1 @@
+const fs=require("fs"),p=require("path"),b=p.join("/Users/rajaperumalsamy/workspaces/trade/src/app/api/stocks"),d=String.fromCharCode(91)+"ticker"+String.fromCharCode(93);["quote","chart","summary","indicators"].forEach(s=>{fs.mkdirSync(p.join(b,d,s),{recursive:\!0})});console.log("ok")

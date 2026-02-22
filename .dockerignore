@@ -1,0 +1,45 @@
+# Dependencies (will be installed fresh in build)
+node_modules
+npm-debug.log*
+
+# Build output
+.next
+out
+
+# Git
+.git
+.gitignore
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment (secrets injected at runtime)
+.env
+.env.local
+.env.*.local
+
+# Database (will be created at runtime)
+data/*.db
+data/*.db-wal
+data/*.db-shm
+
+# Claude/dev files
+.claude
+create-files.js
+create_files.py
+rename.py
+setup.js
+setup.py
+test_setup.py
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
