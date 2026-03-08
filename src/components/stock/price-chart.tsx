@@ -46,16 +46,6 @@ export function PriceChart({ ticker }: PriceChartProps) {
         textColor: "#9ca3af",
         attributionLogo: false,
       },
-      watermark: {
-        visible: true,
-        text: "TradeElite.AI",
-        color: "rgba(0, 184, 160, 0.12)",
-        fontSize: 28,
-        fontFamily: "var(--font-orbitron), 'Orbitron', monospace",
-        fontStyle: "bold",
-        horzAlign: "center",
-        vertAlign: "center",
-      },
       grid: {
         vertLines: { color: "#1f2937" },
         horzLines: { color: "#1f2937" },
@@ -151,7 +141,13 @@ export function PriceChart({ ticker }: PriceChartProps) {
         {isLoading ? (
           <Skeleton className="h-[400px] w-full" />
         ) : (
-          <div ref={chartContainerRef} />
+          <div className="relative">
+            <div ref={chartContainerRef} />
+            <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-2xl font-bold tracking-widest select-none"
+              style={{ color: "rgba(0,184,160,0.10)", fontFamily: "var(--font-orbitron,'Orbitron',monospace)" }}>
+              TradeElite.AI
+            </span>
+          </div>
         )}
       </CardContent>
     </Card>
