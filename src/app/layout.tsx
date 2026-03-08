@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TradeView - Trading Dashboard",
+  title: "TradeElite.AI - Trading Dashboard",
   description: "Personal trading app for stocks, ETFs, and options tracking",
 };
 

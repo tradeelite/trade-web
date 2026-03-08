@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BarChart3,
+  Bot,
   Briefcase,
   Home,
   LineChart,
@@ -16,6 +17,7 @@ const navItems = [
   { href: "/", label: "Dashboard", icon: Home },
   { href: "/portfolio", label: "Portfolios", icon: Briefcase },
   { href: "/options", label: "Options", icon: BarChart3 },
+  { href: "/assistant", label: "AI Assistant", icon: Bot },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

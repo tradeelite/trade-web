@@ -129,25 +129,25 @@ export default function PortfoliosPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {formatCurrency(p.totalValue || 0)}
+                    {formatCurrency(p.total_value || 0)}
                   </div>
                   <div className="flex items-center justify-between">
                     <div
                       className={`flex items-center gap-1 text-sm ${
-                        (p.totalGainLossPercent || 0) >= 0
+                        (p.total_gain_loss_percent || 0) >= 0
                           ? "text-green-500"
                           : "text-red-500"
                       }`}
                     >
-                      {(p.totalGainLossPercent || 0) >= 0 ? (
+                      {(p.total_gain_loss_percent || 0) >= 0 ? (
                         <TrendingUp className="h-3 w-3" />
                       ) : (
                         <TrendingDown className="h-3 w-3" />
                       )}
-                      {formatPercent(p.totalGainLossPercent || 0)}
+                      {formatPercent(p.total_gain_loss_percent || 0)}
                     </div>
                     <span className="text-sm text-muted-foreground">
-                      {p.holdingsCount} holdings
+                      {p.holdings_count} holdings
                     </span>
                   </div>
                 </CardContent>

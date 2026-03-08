@@ -42,7 +42,7 @@ export default function PortfolioDetailPage({
   params: Promise<{ portfolioId: string }>;
 }) {
   const { portfolioId } = use(params);
-  const id = parseInt(portfolioId);
+  const id = portfolioId;
   const router = useRouter();
   const queryClient = useQueryClient();
   const [addOpen, setAddOpen] = useState(false);
@@ -68,7 +68,11 @@ export default function PortfolioDetailPage({
       fetch(`/api/portfolios/${id}/holdings`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ticker: data.ticker,
+          shares: parseFloat(data.shares),
+          avg_cost: parseFloat(data.avgCost),
+        }),
       }).then((r) => r.json()),
     onSuccess: () => {
       queryClient.invalidateQueries({
@@ -85,7 +89,7 @@ export default function PortfolioDetailPage({
   });
 
   const deleteHolding = useMutation({
-    mutationFn: (holdingId: number) =>
+    mutationFn: (holdingId: string) =>
       fetch(`/api/portfolios/${id}/holdings?holdingId=${holdingId}`, {
         method: "DELETE",
       }).then((r) => r.json()),

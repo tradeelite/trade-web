@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(open:*)",
+      "Bash(pkill:*)",
+      "Read(//private/tmp/**)",
+      "Bash(gcloud run services update:*)",
+      "Bash(gcloud run services describe:*)"
+    ]
+  }
+}
