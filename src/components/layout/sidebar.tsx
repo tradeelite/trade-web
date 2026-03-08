@@ -7,11 +7,10 @@ import {
   Bot,
   Briefcase,
   Home,
-  LineChart,
   Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { APP_NAME } from "@/lib/constants";
+import TradeEliteLogo from "@/components/ui/trade-elite-logo";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: Home },
@@ -25,11 +24,10 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-60 flex-col border-r bg-background">
-      <div className="flex h-14 items-center border-b px-6">
-        <Link href="/" className="flex items-center gap-2 font-bold">
-          <LineChart className="h-5 w-5 text-primary" />
-          {APP_NAME}
+    <aside className="fixed left-0 top-0 z-40 flex h-screen w-72 flex-col border-r bg-background">
+      <div className="flex h-24 items-center border-b px-4">
+        <Link href="/" className="flex items-center">
+          <TradeEliteLogo width={256} showWordmark={true} />
         </Link>
       </div>
       <nav className="flex-1 space-y-1 p-4">

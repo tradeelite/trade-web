@@ -44,6 +44,17 @@ export function PriceChart({ ticker }: PriceChartProps) {
       layout: {
         background: { color: "transparent" },
         textColor: "#9ca3af",
+        attributionLogo: false,
+      },
+      watermark: {
+        visible: true,
+        text: "TradeElite.AI",
+        color: "rgba(0, 184, 160, 0.12)",
+        fontSize: 28,
+        fontFamily: "var(--font-orbitron), 'Orbitron', monospace",
+        fontStyle: "bold",
+        horzAlign: "center",
+        vertAlign: "center",
       },
       grid: {
         vertLines: { color: "#1f2937" },

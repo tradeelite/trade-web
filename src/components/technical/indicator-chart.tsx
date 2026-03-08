@@ -80,7 +80,21 @@ export function IndicatorChart({ ticker }: IndicatorChartProps) {
     macdChartInstanceRef.current?.remove();
 
     const chartOpts = {
-      layout: { background: { color: "transparent" }, textColor: "#9ca3af" },
+      layout: {
+        background: { color: "transparent" },
+        textColor: "#9ca3af",
+        attributionLogo: false,
+      },
+      watermark: {
+        visible: true,
+        text: "TradeElite.AI",
+        color: "rgba(0, 184, 160, 0.10)",
+        fontSize: 20,
+        fontFamily: "var(--font-orbitron), 'Orbitron', monospace",
+        fontStyle: "bold",
+        horzAlign: "center" as const,
+        vertAlign: "center" as const,
+      },
       grid: { vertLines: { color: "#1f2937" }, horzLines: { color: "#1f2937" } },
       width: mainChartRef.current.clientWidth,
       crosshair: { mode: 0 as const },
@@ -171,6 +185,7 @@ export function IndicatorChart({ ticker }: IndicatorChartProps) {
     if (showRSI && rsiChartRef.current && indicators?.rsi?.length > 0) {
       const rsiChart = createChart(rsiChartRef.current, {
         ...chartOpts,
+        watermark: { visible: false },
         height: 120,
         width: rsiChartRef.current.clientWidth,
       });
@@ -206,6 +221,7 @@ export function IndicatorChart({ ticker }: IndicatorChartProps) {
     if (showMACD && macdChartRef.current && indicators?.macd?.length > 0) {
       const macdChart = createChart(macdChartRef.current, {
         ...chartOpts,
+        watermark: { visible: false },
         height: 120,
         width: macdChartRef.current.clientWidth,
       });
