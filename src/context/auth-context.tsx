@@ -14,7 +14,7 @@ import {
   signOut as firebaseSignOut,
 } from "firebase/auth";
 import { useRouter } from "next/navigation";
-import { auth } from "@/lib/firebase";
+import { auth, isFirebaseConfigured } from "@/lib/firebase";
 
 interface AuthContextValue {
   user: User | null;
@@ -31,10 +31,13 @@ const BACKEND_URL =
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(auth && isFirebaseConfigured));
   const router = useRouter();
 
   useEffect(() => {
+    if (!auth || !isFirebaseConfigured) {
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
@@ -43,6 +46,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   async function signIn(email: string, password: string) {
+    if (!auth || !isFirebaseConfigured) {
+      throw new Error("Authentication is not configured. Set NEXT_PUBLIC_FIREBASE_* environment variables.");
+    }
     const result = await signInWithEmailAndPassword(auth, email, password);
 
     // Check backend allowlist
@@ -58,6 +64,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function signOut() {
+    if (!auth || !isFirebaseConfigured) {
+      router.push("/login");
+      return;
+    }
     await firebaseSignOut(auth);
     router.push("/login");
   }
