@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Sparkles } from "lucide-react";
 import { QUERY_KEYS, STALE_TIMES } from "@/lib/constants";
-import { StockAnalysis } from "@/types/stock-analysis";
+import { FundamentalAnalysis, StockAnalysis } from "@/types/stock-analysis";
 import { AnalysisSummary } from "./analysis-summary";
 import { TechnicalPanel } from "./technical-panel";
 import { FundamentalPanel } from "./fundamental-panel";
@@ -33,6 +33,17 @@ export function StockAnalysisPanel({ ticker }: StockAnalysisPanelProps) {
     },
     staleTime: STALE_TIMES.ANALYSIS,
     retry: 1,
+  });
+
+  const { data: deepFundamental } = useQuery<FundamentalAnalysis>({
+    queryKey: QUERY_KEYS.stockFundamentalAnalysis(ticker),
+    queryFn: async () => {
+      const r = await fetch(`/api/stocks/${ticker}/fundamental-analysis`);
+      if (!r.ok) throw new Error("Deep fundamental analysis unavailable");
+      return r.json();
+    },
+    staleTime: STALE_TIMES.ANALYSIS,
+    retry: 0,
   });
 
   if (isLoading || isFetching) {
@@ -107,15 +118,19 @@ export function StockAnalysisPanel({ ticker }: StockAnalysisPanelProps) {
     );
   }
 
+  const mergedAnalysis: StockAnalysis = deepFundamental
+    ? { ...data, fundamental: deepFundamental }
+    : data;
+
   return (
     <div className="space-y-4">
-      <AnalysisSummary analysis={data} />
+      <AnalysisSummary analysis={mergedAnalysis} />
       {/* Technical takes full width — it has a rich multi-card layout */}
-      <TechnicalPanel technical={data.technical} />
+      <TechnicalPanel technical={mergedAnalysis.technical} />
       {/* Fundamental + News side by side */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <FundamentalPanel fundamental={data.fundamental} />
-        <NewsPanel news={data.news} />
+        <FundamentalPanel fundamental={mergedAnalysis.fundamental} />
+        <NewsPanel news={mergedAnalysis.news} />
       </div>
     </div>
   );

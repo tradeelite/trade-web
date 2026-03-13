@@ -31,6 +31,7 @@ export const QUERY_KEYS = {
   stockNews: (ticker: string) => ["stocks", ticker, "news"] as const,
   stockSentiment: (ticker: string) => ["stocks", ticker, "sentiment"] as const,
   stockAnalysis: (ticker: string) => ["stocks", ticker, "ai-analysis"] as const,
+  stockFundamentalAnalysis: (ticker: string) => ["stocks", ticker, "fundamental-analysis"] as const,
   stockTechnicalSignals: (ticker: string) => ["stocks", ticker, "technical-signals"] as const,
   portfolios: () => ["portfolios"] as const,
   portfolio: (id: string) => ["portfolios", id] as const,

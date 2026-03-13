@@ -11,6 +11,7 @@ import { TechnicalAnalysis } from "@/components/technical/technical-analysis";
 import { StockNews } from "@/components/stock/stock-news";
 import { StockSentiment } from "@/components/stock/stock-sentiment";
 import { StockAnalysisPanel } from "@/components/stock/ai-analysis/stock-analysis-panel";
+import { FundamentalAnalysisTab } from "@/components/stock/ai-analysis/fundamental-analysis-tab";
 import { Sparkles } from "lucide-react";
 import { QUERY_KEYS, STALE_TIMES } from "@/lib/constants";
 
@@ -40,6 +41,10 @@ export default function StockDetailPage({
           <TabsTrigger value="technical">Technical Analysis</TabsTrigger>
           <TabsTrigger value="info">Company Info</TabsTrigger>
           <TabsTrigger value="news">News & Sentiment</TabsTrigger>
+          <TabsTrigger value="fundamental-ai" className="flex items-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5" />
+            Fundamental AI
+          </TabsTrigger>
           <TabsTrigger value="ai" className="flex items-center gap-1.5">
             <Sparkles className="h-3.5 w-3.5" />
             AI Analysis
@@ -58,6 +63,9 @@ export default function StockDetailPage({
         <TabsContent value="news" className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
           <StockNews ticker={upperTicker} />
           <StockSentiment ticker={upperTicker} />
+        </TabsContent>
+        <TabsContent value="fundamental-ai">
+          <FundamentalAnalysisTab ticker={upperTicker} />
         </TabsContent>
         <TabsContent value="ai">
           <StockAnalysisPanel ticker={upperTicker} />

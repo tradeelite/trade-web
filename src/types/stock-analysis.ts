@@ -4,6 +4,7 @@ export type OverallRecommendation = "Strong Buy" | "Buy" | "Hold" | "Sell" | "St
 export type Confidence = "high" | "medium" | "low";
 export type ValuationSignal = "undervalued" | "fairly_valued" | "overvalued";
 export type HealthSignal = "strong" | "moderate" | "weak";
+export type AttributeSignal = "bullish" | "neutral" | "bearish";
 
 export interface MovingAverageRow {
   name: string;
@@ -120,6 +121,40 @@ export interface TechnicalAnalysis {
 
 export interface FundamentalAnalysis {
   ticker: string;
+  asOf?: string | null;
+  priceContext?: {
+    currentPrice: number | null;
+    marketCap: number | null;
+    enterpriseValue: number | null;
+  } | null;
+  attributes?: Record<string, {
+    signal?: AttributeSignal;
+    score?: number | null;
+    metrics?: Record<string, number | string | null | string[]>;
+    explanation?: string;
+    items?: string[];
+  }> | null;
+  aiAnalysis?: {
+    overallScore?: number | null;
+    recommendation?: OverallRecommendation | Recommendation | null;
+    confidence?: Confidence | null;
+    horizonView?: {
+      shortTerm?: SignalDirection | null;
+      mediumTerm?: SignalDirection | null;
+      longTerm?: SignalDirection | null;
+    } | null;
+    bullCase?: string[];
+    bearCase?: string[];
+    keyDrivers?: string[];
+    finalExplanation?: string;
+  } | null;
+  sources?: Array<{
+    name?: string;
+    url?: string;
+    publishedAt?: string | null;
+    usedFor?: string[];
+    quality?: "high" | "medium" | "low" | string;
+  }>;
   valuation: {
     signal: ValuationSignal;
     peRatio: number | null;
