@@ -10,11 +10,15 @@ const BACKEND_URL = process.env.BACKEND_URL ?? "http://localhost:8000";
 async function proxy(req: NextRequest, slug: string[]): Promise<NextResponse> {
   const path = slug.join("/");
   const targetUrl = `${BACKEND_URL}/api/${path}${req.nextUrl.search}`;
+  const userEmailCookie = req.cookies.get("te_user_email")?.value;
 
   const headers = new Headers();
   req.headers.forEach((value, key) => {
     if (key !== "host") headers.set(key, value);
   });
+  if (userEmailCookie && !headers.has("x-user-email")) {
+    headers.set("x-user-email", decodeURIComponent(userEmailCookie));
+  }
 
   const body =
     req.method !== "GET" && req.method !== "HEAD"

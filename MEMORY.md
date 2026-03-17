@@ -30,9 +30,17 @@
 - Deep endpoint is preferred when present; fallback remains active.
 - Stock detail tabs are horizontally scrollable on mobile to prevent clipped tab labels.
 - Search trigger width is constrained for small screens.
+- Multi-user data isolation path:
+  - Auth context writes signed-in email into `te_user_email` cookie
+  - Catch-all API proxy injects `x-user-email` header from cookie to backend
+  - Backend filters portfolio/options data by `user_email`
+- Settings page behavior:
+  - Admin users can manage allowlist and global data provider setting
+  - Demo/regular users see settings in read-only scope for admin controls
 
 ## Known Gaps
 
 - Visual distinction between fallback and deep-merged mode can be clearer.
 - Source quality presentation can be improved.
 - Need device QA pass for iOS Safari safe-area and drawer ergonomics.
+- User identity is forwarded as header from cookie and not yet verified via Firebase token on backend.

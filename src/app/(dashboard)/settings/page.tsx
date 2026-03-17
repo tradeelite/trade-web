@@ -17,10 +17,22 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { QUERY_KEYS } from "@/lib/constants";
 import { toast } from "sonner";
 import { Trash2, Plus, UserCheck } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
 
 export default function SettingsPage() {
   const queryClient = useQueryClient();
   const [newEmail, setNewEmail] = useState("");
+  const { user } = useAuth();
+
+  const { data: currentUser } = useQuery({
+    queryKey: ["users", "me", user?.email],
+    queryFn: () =>
+      fetch("/api/users/me", { headers: { "x-user-email": user?.email ?? "" } }).then((r) =>
+        r.ok ? r.json() : { is_admin: false }
+      ),
+    enabled: Boolean(user?.email),
+  });
+  const isAdmin = Boolean(currentUser?.is_admin);
 
   const { data: settings, isLoading } = useQuery({
     queryKey: QUERY_KEYS.settings(),
@@ -29,7 +41,8 @@ export default function SettingsPage() {
 
   const { data: allowedUsers, isLoading: usersLoading } = useQuery({
     queryKey: QUERY_KEYS.allowedUsers(),
-    queryFn: () => fetch("/api/users").then((r) => r.json()),
+    queryFn: () => fetch("/api/users").then((r) => (r.ok ? r.json() : [])),
+    enabled: isAdmin,
   });
 
   const updateSetting = useMutation({
@@ -100,6 +113,7 @@ export default function SettingsPage() {
             ) : (
               <Select
                 value={settings?.data_provider || "yahoo"}
+                disabled={!isAdmin}
                 onValueChange={(v) =>
                   updateSetting.mutate({ key: "data_provider", value: v })
                 }
@@ -113,10 +127,16 @@ export default function SettingsPage() {
                 </SelectContent>
               </Select>
             )}
+            {!isAdmin && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Data provider is a global setting and can only be changed by the admin user.
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
 
+      {isAdmin ? (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -182,6 +202,18 @@ export default function SettingsPage() {
           )}
         </CardContent>
       </Card>
+      ) : (
+      <Card>
+        <CardHeader>
+          <CardTitle>Account Scope</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            You are signed in as a regular/demo user. User management and global app settings are admin-only.
+          </p>
+        </CardContent>
+      </Card>
+      )}
 
       <Card>
         <CardHeader>
