@@ -34,6 +34,9 @@
   - Auth context writes signed-in email into `te_user_email` cookie
   - Catch-all API proxy injects `x-user-email` header from cookie to backend
   - Backend filters portfolio/options data by `user_email`
+- Settings page behavior:
+  - Admin users can manage allowlist and global data provider setting
+  - Demo/regular users see settings in read-only scope for admin controls
 
 ## Known Gaps
 

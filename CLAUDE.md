@@ -96,6 +96,9 @@ All three long-scroll tabs have a sticky `SectionJumpBar`:
 
 Backend allowlist check (`/api/users/check`) is **fail-open**: only blocks login if the response is OK AND `data.allowed === false`. Network errors or non-OK responses allow login through. See `src/context/auth-context.tsx`.
 - Auth provider syncs signed-in email to `te_user_email` cookie; proxy uses it to send user context header to backend for data isolation.
+- Settings page is role-aware:
+  - Admin users can manage allowlist and global data provider
+  - Demo/regular users see admin controls disabled/hidden
 
 ## Build Notes
 
