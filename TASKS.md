@@ -4,6 +4,10 @@
 - [2026-03-12] Improve visual differentiation between legacy and deep fundamental modes in UI.
 
 ## Completed
+- [2026-03-17] Added user context propagation for multi-user portfolio/options isolation
+  - `auth-context.tsx` now syncs signed-in user email to `te_user_email` cookie
+  - `src/app/api/[...slug]/route.ts` reads cookie and forwards `x-user-email` to backend
+  - No frontend API callsite changes required; existing `/api/*` fetch usage continues
 - [2026-03-17] Mobile dashboard responsiveness overhaul
   - Added responsive app shell (`layout.tsx`) with mobile-first spacing and `overflow-x-hidden`
   - Implemented mobile drawer navigation in `sidebar.tsx` (`Sheet` + close-on-link-click)

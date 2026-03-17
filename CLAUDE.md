@@ -49,6 +49,7 @@ File: `src/app/(dashboard)/stock/[ticker]/page.tsx`
 - `/api/stocks/[ticker]/fundamental-analysis` → backend dedicated deep fundamental analysis
 - `/api/stocks/[ticker]/news-analysis` → caught by catch-all proxy → backend news synthesis
 - `/api/stocks/[ticker]/technical-signals` → caught by catch-all proxy → backend technical signals
+- `/api/*` catch-all proxy now forwards `x-user-email` from `te_user_email` cookie for user-owned backend routes (`portfolios`, `options`)
 
 ## Key Components
 
@@ -94,6 +95,7 @@ All three long-scroll tabs have a sticky `SectionJumpBar`:
 `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, and `NEXT_PUBLIC_FIREBASE_PROJECT_ID` must be present for login. These are baked in at Docker build time — pass as `--substitutions` in Cloud Build.
 
 Backend allowlist check (`/api/users/check`) is **fail-open**: only blocks login if the response is OK AND `data.allowed === false`. Network errors or non-OK responses allow login through. See `src/context/auth-context.tsx`.
+- Auth provider syncs signed-in email to `te_user_email` cookie; proxy uses it to send user context header to backend for data isolation.
 
 ## Build Notes
 

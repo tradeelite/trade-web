@@ -28,6 +28,20 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL ??
   "https://trade-backend-685436576212.us-central1.run.app";
+const USER_EMAIL_COOKIE = "te_user_email";
+
+function syncUserEmailCookie(email?: string | null) {
+  if (typeof document === "undefined") {
+    return;
+  }
+  if (email) {
+    document.cookie = `${USER_EMAIL_COOKIE}=${encodeURIComponent(
+      email.toLowerCase()
+    )}; Path=/; Max-Age=2592000; SameSite=Lax`;
+    return;
+  }
+  document.cookie = `${USER_EMAIL_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -40,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
+      syncUserEmailCookie(firebaseUser?.email ?? null);
       setLoading(false);
     });
     return () => unsubscribe();
@@ -75,10 +90,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function signOut() {
     if (!auth || !isFirebaseConfigured) {
+      syncUserEmailCookie(null);
       router.push("/login");
       return;
     }
     await firebaseSignOut(auth);
+    syncUserEmailCookie(null);
     router.push("/login");
   }
 
