@@ -124,36 +124,75 @@ function SignalCount({ buy, neutral, sell }: { buy: number; neutral: number; sel
 // ─── Derive oscillator table rows ─────────────────────────────────────────────
 
 function deriveOscRows(m: TechnicalAnalysis["momentum"], ts?: TechnicalAnalysis["trendStrength"]) {
-  const rows: { name: string; value: string; signal: "Buy" | "Sell" | "Neutral" }[] = [];
+  const rows: { name: string; value: string; signal: "Buy" | "Sell" | "Neutral"; explanation: string }[] = [];
 
   if (m.rsi != null) {
     const sig: "Buy" | "Sell" | "Neutral" = m.rsi < 30 ? "Buy" : m.rsi > 70 ? "Sell" : "Neutral";
     const status = m.rsiStatus ?? (m.rsi > 70 ? "Overbought" : m.rsi < 30 ? "Oversold" : "Neutral");
-    rows.push({ name: "RSI (14)", value: `${fmt(m.rsi, 1)}  —  ${status}`, signal: sig });
+    const explanation = m.rsi < 30
+      ? "Oversold territory — historically a mean-reversion buy zone"
+      : m.rsi < 45
+      ? "Recovering from weakness — early bullish momentum building"
+      : m.rsi < 55
+      ? "Neutral momentum — no directional edge"
+      : m.rsi < 70
+      ? "Healthy bullish momentum — trend strength confirmed"
+      : "Overbought — stretched; watch for pullback or consolidation";
+    rows.push({ name: "RSI (14)", value: `${fmt(m.rsi, 1)} — ${status}`, signal: sig, explanation });
   }
   if (m.rsiWeekly != null) {
     const sig: "Buy" | "Sell" | "Neutral" = m.rsiWeekly < 30 ? "Buy" : m.rsiWeekly > 70 ? "Sell" : "Neutral";
-    rows.push({ name: "RSI (14) Weekly", value: `${fmt(m.rsiWeekly, 1)}  —  ${m.rsiWeekly > 70 ? "Overbought" : m.rsiWeekly < 30 ? "Oversold" : "Neutral"}`, signal: sig });
+    const weeklyStatus = m.rsiWeekly > 70 ? "Overbought" : m.rsiWeekly < 30 ? "Oversold" : "Neutral";
+    const explanation = m.rsiWeekly < 30
+      ? "Weekly oversold — major support zone; high-conviction long-term buy signal"
+      : m.rsiWeekly > 70
+      ? "Weekly overbought — extended on longer timeframe; proceed with caution"
+      : "Weekly RSI neutral — no extreme reading on the weekly chart";
+    rows.push({ name: "RSI (14) Weekly", value: `${fmt(m.rsiWeekly, 1)} — ${weeklyStatus}`, signal: sig, explanation });
   }
 
   const macdStr = (m.macd ?? "").toLowerCase();
   const macdSig: "Buy" | "Sell" | "Neutral" = macdStr === "bullish" ? "Buy" : macdStr === "bearish" ? "Sell" : "Neutral";
-  rows.push({ name: "MACD", value: `${m.macd ?? "—"}${m.macdHistogram ? `  (${m.macdHistogram})` : ""}`, signal: macdSig });
+  const hist = (m.macdHistogram ?? "").toLowerCase();
+  const macdExplanation = macdSig === "Buy"
+    ? `MACD above signal line${hist.includes("expand") ? " with expanding histogram" : ""} — upward momentum confirmed`
+    : macdSig === "Sell"
+    ? `MACD below signal line${hist.includes("contract") ? " with contracting histogram" : ""} — downward pressure building`
+    : "MACD near signal line — no clear directional conviction";
+  rows.push({ name: "MACD", value: `${m.macd ?? "—"}${m.macdHistogram ? ` (${m.macdHistogram})` : ""}`, signal: macdSig, explanation: macdExplanation });
 
   if (m.stochasticK != null) {
     const sig: "Buy" | "Sell" | "Neutral" = m.stochasticK < 20 ? "Buy" : m.stochasticK > 80 ? "Sell" : "Neutral";
     const status = m.stochasticStatus ?? (m.stochasticK > 80 ? "Overbought" : m.stochasticK < 20 ? "Oversold" : "Neutral");
-    rows.push({ name: "Stochastic (14,3,3)", value: `${fmt(m.stochasticK, 1)} / ${fmt(m.stochasticD, 1)}  —  ${status}`, signal: sig });
+    const explanation = m.stochasticK < 20
+      ? "Stochastic deeply oversold — short-term reversal likely"
+      : m.stochasticK > 80
+      ? "Stochastic overbought — short-term pullback risk elevated"
+      : "Stochastic neutral — momentum neither extreme nor committed";
+    rows.push({ name: "Stochastic (14,3,3)", value: `${fmt(m.stochasticK, 1)} / ${fmt(m.stochasticD, 1)} — ${status}`, signal: sig, explanation });
   }
 
   if (ts?.adx != null) {
     const sig: "Buy" | "Sell" | "Neutral" = ts.adx > 25 ? (ts.diControl === "bulls" ? "Buy" : "Sell") : "Neutral";
-    rows.push({ name: "ADX (14)", value: `${fmt(ts.adx, 1)}  —  ${ts.adxStrength ?? "moderate"}`, signal: sig });
+    const strength = ts.adxStrength ?? "moderate";
+    const explanation = ts.adx < 20
+      ? "Weak trend — price likely in a range or choppy; signals less reliable"
+      : ts.adx < 40
+      ? `Moderate ${strength} trend — ${ts.diControl === "bulls" ? "bulls" : ts.diControl === "bears" ? "bears" : "neither side"} in control`
+      : `Strong trend (ADX ${fmt(ts.adx, 1)}) — ${ts.diControl === "bulls" ? "bulls dominant, ride the trend" : "bears dominant, avoid longs"}`;
+    rows.push({ name: "ADX (14)", value: `${fmt(ts.adx, 1)} — ${strength}`, signal: sig, explanation });
   }
 
   if (m.roc10d != null) {
     const sig: "Buy" | "Sell" | "Neutral" = m.roc10d > 0 ? "Buy" : m.roc10d < 0 ? "Sell" : "Neutral";
-    rows.push({ name: "ROC (10)", value: pct(m.roc10d), signal: sig });
+    const explanation = m.roc10d > 3
+      ? "Strong positive momentum over 10 days — price accelerating upward"
+      : m.roc10d > 0
+      ? "Mild positive momentum — slight upward bias over 10 days"
+      : m.roc10d < -3
+      ? "Strong negative momentum over 10 days — price losing ground fast"
+      : "Mild negative momentum — slight downward drift over 10 days";
+    rows.push({ name: "ROC (10D)", value: pct(m.roc10d), signal: sig, explanation });
   }
 
   return rows;
@@ -301,6 +340,7 @@ export function TechnicalPanel({ technical: t }: TechnicalPanelProps) {
                 <th className="text-left py-1.5 font-medium">Indicator</th>
                 <th className="text-left py-1.5 font-medium hidden sm:table-cell">Value</th>
                 <th className="text-center py-1.5 font-medium">Signal</th>
+                <th className="text-right py-1.5 font-medium hidden lg:table-cell">Explanation</th>
               </tr>
             </thead>
             <tbody>
@@ -309,6 +349,7 @@ export function TechnicalPanel({ technical: t }: TechnicalPanelProps) {
                   <td className="py-1.5">{row.name}</td>
                   <td className="py-1.5 text-muted-foreground hidden sm:table-cell">{row.value}</td>
                   <td className="py-1.5 text-center"><MaBadge signal={row.signal} /></td>
+                  <td className="py-1.5 text-right text-xs text-muted-foreground hidden lg:table-cell max-w-[260px]">{row.explanation}</td>
                 </tr>
               ))}
             </tbody>

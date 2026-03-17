@@ -1,16 +1,49 @@
 "use client";
 
+import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Sparkles } from "lucide-react";
 import { QUERY_KEYS, STALE_TIMES } from "@/lib/constants";
-import { FundamentalAnalysis, StockAnalysis } from "@/types/stock-analysis";
+import { FundamentalAnalysis, RichFundamentalAnalysis, StockAnalysis } from "@/types/stock-analysis";
+import { SectionJumpBar } from "@/components/ui/section-jump-bar";
 import { AnalysisSummary } from "./analysis-summary";
 import { TechnicalPanel } from "./technical-panel";
 import { FundamentalPanel } from "./fundamental-panel";
+import { FundamentalDashboard } from "./fundamental-dashboard";
 import { NewsPanel } from "./news-panel";
+
+const AI_SECTIONS = [
+  { id: "ai-summary", label: "Summary" },
+  { id: "ai-technical", label: "Technical" },
+  { id: "ai-fundamental", label: "Fundamental" },
+  { id: "ai-news", label: "News" },
+];
+
+class SectionErrorBoundary extends React.Component<
+  { label: string; children: React.ReactNode },
+  { error: Error | null }
+> {
+  constructor(props: { label: string; children: React.ReactNode }) {
+    super(props);
+    this.state = { error: null };
+  }
+  static getDerivedStateFromError(error: Error) { return { error }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <Card>
+          <CardContent className="pt-4">
+            <p className="text-xs text-destructive font-mono">[{this.props.label} crash] {this.state.error.message}</p>
+          </CardContent>
+        </Card>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 interface StockAnalysisPanelProps {
   ticker: string;
@@ -124,14 +157,48 @@ export function StockAnalysisPanel({ ticker }: StockAnalysisPanelProps) {
 
   return (
     <div className="space-y-4">
-      <AnalysisSummary analysis={mergedAnalysis} />
-      {/* Technical takes full width — it has a rich multi-card layout */}
-      <TechnicalPanel technical={mergedAnalysis.technical} />
-      {/* Fundamental + News side by side */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <FundamentalPanel fundamental={mergedAnalysis.fundamental} />
-        <NewsPanel news={mergedAnalysis.news} />
+      <SectionJumpBar sections={AI_SECTIONS} />
+      <div id="ai-summary" className="scroll-mt-32">
+        <SectionErrorBoundary label="AnalysisSummary">
+          <AnalysisSummary analysis={mergedAnalysis} />
+        </SectionErrorBoundary>
       </div>
+      <div id="ai-technical" className="scroll-mt-32">
+        <SectionErrorBoundary label="TechnicalPanel">
+          <TechnicalPanel technical={mergedAnalysis.technical} />
+        </SectionErrorBoundary>
+      </div>
+      {(() => {
+        const fundData = mergedAnalysis.fundamental;
+        const isRich = fundData && "header" in fundData && Array.isArray((fundData as any).valuation);
+        return isRich ? (
+          <>
+            <div id="ai-fundamental" className="scroll-mt-32">
+              <SectionErrorBoundary label="FundamentalDashboard">
+                <FundamentalDashboard data={fundData as unknown as RichFundamentalAnalysis} ticker={ticker} />
+              </SectionErrorBoundary>
+            </div>
+            <div id="ai-news" className="scroll-mt-32">
+              <SectionErrorBoundary label="NewsPanel">
+                <NewsPanel news={mergedAnalysis.news} />
+              </SectionErrorBoundary>
+            </div>
+          </>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <div id="ai-fundamental" className="scroll-mt-32">
+              <SectionErrorBoundary label="FundamentalPanel">
+                <FundamentalPanel fundamental={fundData} isDeepMerge={!!deepFundamental} />
+              </SectionErrorBoundary>
+            </div>
+            <div id="ai-news" className="scroll-mt-32">
+              <SectionErrorBoundary label="NewsPanel">
+                <NewsPanel news={mergedAnalysis.news} />
+              </SectionErrorBoundary>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
