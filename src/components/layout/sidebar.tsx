@@ -4,24 +4,24 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   BarChart3,
-  Bot,
   Briefcase,
   Home,
   Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import TradeEliteLogo from "@/components/ui/trade-elite-logo";
+import { TeAriaBadge } from "@/components/ai/te-aria-badge";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: Home },
   { href: "/portfolio", label: "Portfolios", icon: Briefcase },
   { href: "/options", label: "Options", icon: BarChart3 },
-  { href: "/assistant", label: "AI Assistant", icon: Bot },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const isAssistantActive = pathname.startsWith("/assistant");
 
   return (
     <aside className="fixed left-0 top-0 z-40 flex h-screen w-72 flex-col border-r bg-background">
@@ -52,6 +52,19 @@ export function Sidebar() {
             </Link>
           );
         })}
+
+        {/* TEARIA — special nav item with brand mark */}
+        <Link
+          href="/assistant"
+          className={cn(
+            "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+            isAssistantActive
+              ? "bg-primary/10 text-primary"
+              : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          )}
+        >
+          <TeAriaBadge size="sm" />
+        </Link>
       </nav>
     </aside>
   );

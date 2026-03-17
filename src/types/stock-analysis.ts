@@ -1,3 +1,49 @@
+export type SignalType = "bullish" | "neutral" | "bearish";
+
+export interface MetricRow {
+  metric: string;          // e.g. "P/E ratio (TTM) ⭐" — ⭐ inline in string
+  value: string | null;    // pre-formatted: "40.71x", "$6.47", "55.60%", "N/A"
+  benchmark?: string;      // "S&P avg ~22x", "Fair value = 1.0", "—" or omit
+  signal: SignalType;
+  signalLabel: string;     // "Bullish", "Neutral", "Premium", "Elevated", "Exceptional", "Risky", "Fortress", "Weak", "Strong"
+  interpretation: string;  // ≤10 words, specific to the actual number
+}
+
+export interface VerdictRow {
+  investorType: string;    // "Long-term investor (3–5 yr)", "Current holder", "Short-term trader", "Income / conservative"
+  verdict: string;         // "Buy" | "Hold" | "Sell" | "Avoid" | "Watch"
+  reasoning: string;       // ≤15 words citing key numbers
+}
+
+export interface RichFundamentalAnalysis {
+  ticker: string;
+  companyName?: string;
+  sector?: string;
+  asOf: string;
+  // 4 header metric cards
+  header: {
+    price: string;        // "$180.25"
+    marketCap: string;    // "$4.45T"
+    revenue: string;      // "$215.9B"
+    netIncome: string;    // "$120.1B"
+  };
+  // metric table sections
+  valuation: MetricRow[];
+  profitability: MetricRow[];
+  financialHealth: MetricRow[];
+  growth: MetricRow[];
+  earnings: MetricRow[];
+  dividends: MetricRow[];
+  // Final verdict
+  verdict: VerdictRow[];
+  keyRisk: string;         // "[Metric] of [value] — [plain English consequence]"
+  // Text sections
+  intro: string;           // one sentence: "TICKER — Company | Sector | Price | Overall:"
+  summary: string;         // 3–5 sentence paragraph
+  // Sources
+  sources?: string[];
+}
+
 export type SignalDirection = "bullish" | "bearish" | "neutral";
 export type Recommendation = "Buy" | "Sell" | "Hold" | "Watch";
 export type OverallRecommendation = "Strong Buy" | "Buy" | "Hold" | "Sell" | "Strong Sell";

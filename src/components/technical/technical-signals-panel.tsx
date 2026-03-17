@@ -4,6 +4,16 @@ import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { QUERY_KEYS, STALE_TIMES } from "@/lib/constants";
+import { SectionJumpBar } from "@/components/ui/section-jump-bar";
+
+const TA_SECTIONS = [
+  { id: "ta-summary", label: "Summary" },
+  { id: "ta-moving-averages", label: "Moving Averages" },
+  { id: "ta-oscillators", label: "Oscillators" },
+  { id: "ta-volume", label: "Volume & Volatility" },
+  { id: "ta-trend", label: "Trend Strength" },
+  { id: "ta-relative-strength", label: "vs S&P 500" },
+];
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -83,6 +93,9 @@ interface TechnicalSignals {
     minusDI: number | null;
     strength: string;
     diControl: string;
+    relativeStrength1M?: number | null;
+    relativeStrength3M?: number | null;
+    relativeStrength6M?: number | null;
   };
   snapshot: {
     fiftyTwoWeekHigh: number | null;
@@ -205,6 +218,9 @@ function oscDisplayValue(osc: OscRow): string {
   if (osc.name.startsWith("Bollinger")) return `%B:${fmt(osc.percentB, 2)}`;
   if (osc.name.startsWith("ADX")) return `${fmt(osc.adx, 1)} (+${fmt(osc.plusDI, 1)} / -${fmt(osc.minusDI, 1)})`;
   if (osc.name === "OBV") return osc.trend ?? "—";
+  if (osc.name === "Ichimoku Cloud") return osc.status ?? "—";
+  if (osc.name.startsWith("ROC")) return osc.value != null ? `${osc.value >= 0 ? "+" : ""}${fmt(osc.value, 2)}%` : "—";
+  if (osc.name === "Acc/Distribution") return osc.trend ?? "—";
   return "—";
 }
 
@@ -219,6 +235,7 @@ function oscDetail(osc: OscRow): string | null {
   if (osc.name.startsWith("Stoch") && osc.status && osc.status !== "neutral") return osc.status;
   if (osc.name.startsWith("Bollinger") && osc.position) return "at " + osc.position + " band";
   if (osc.name.startsWith("ADX")) return osc.strength + " trend · " + osc.diControl + " in control";
+  if (osc.name === "Ichimoku Cloud" && osc.trend) return osc.trend;
   return null;
 }
 
@@ -263,8 +280,10 @@ export function TechnicalSignalsPanel({ ticker }: { ticker: string }) {
   return (
     <div className="space-y-4">
 
+      <SectionJumpBar sections={TA_SECTIONS} />
+
       {/* ── Gauge Row ──────────────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-border/60 bg-card p-4">
+      <div id="ta-summary" className="scroll-mt-32 rounded-xl border border-border/60 bg-card p-4">
         <div className="flex items-center justify-center gap-8 flex-wrap">
           <Gauge
             buy={maOsc.buy} neutral={maOsc.neutral} sell={maOsc.sell}
@@ -319,7 +338,7 @@ export function TechnicalSignalsPanel({ ticker }: { ticker: string }) {
       </div>
 
       {/* ── Moving Averages Table ─────────────────────────────────────────── */}
-      <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+      <div id="ta-moving-averages" className="scroll-mt-32 rounded-xl border border-border/60 bg-card overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
           <h3 className="text-sm font-semibold">Moving Averages</h3>
           <div className="flex items-center gap-2 text-xs">
@@ -362,7 +381,7 @@ export function TechnicalSignalsPanel({ ticker }: { ticker: string }) {
       </div>
 
       {/* ── Oscillators Table ─────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-border/60 bg-card overflow-hidden">
+      <div id="ta-oscillators" className="scroll-mt-32 rounded-xl border border-border/60 bg-card overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
           <h3 className="text-sm font-semibold">Oscillators &amp; Trend</h3>
           <div className="flex items-center gap-2 text-xs">
@@ -396,7 +415,7 @@ export function TechnicalSignalsPanel({ ticker }: { ticker: string }) {
       </div>
 
       {/* ── Volume & Volatility row ────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div id="ta-volume" className="scroll-mt-32 grid grid-cols-1 sm:grid-cols-2 gap-4">
         {/* Volume */}
         <div className="rounded-xl border border-border/60 bg-card p-4 space-y-2">
           <div className="flex items-center justify-between">
@@ -441,7 +460,7 @@ export function TechnicalSignalsPanel({ ticker }: { ticker: string }) {
       </div>
 
       {/* ── Trend Strength (ADX) ──────────────────────────────────────────── */}
-      <div className="rounded-xl border border-border/60 bg-card p-4 space-y-2">
+      <div id="ta-trend" className="scroll-mt-32 rounded-xl border border-border/60 bg-card p-4 space-y-2">
         <h3 className="text-sm font-semibold">Trend Strength (ADX)</h3>
         <div className="flex flex-wrap gap-6 text-xs">
           <div>
@@ -489,6 +508,30 @@ export function TechnicalSignalsPanel({ ticker }: { ticker: string }) {
           </div>
         )}
       </div>
+
+      {/* ── Relative Strength vs S&P 500 ──────────────────────────────────── */}
+      {(trendStrength.relativeStrength1M != null || trendStrength.relativeStrength3M != null || trendStrength.relativeStrength6M != null) && (
+        <div id="ta-relative-strength" className="scroll-mt-32 rounded-xl border border-border/60 bg-card p-4 space-y-2">
+          <h3 className="text-sm font-semibold">Relative Strength vs S&P 500</h3>
+          <div className="flex flex-wrap gap-6 text-xs">
+            {([
+              ["1 Month", trendStrength.relativeStrength1M],
+              ["3 Months", trendStrength.relativeStrength3M],
+              ["6 Months", trendStrength.relativeStrength6M],
+            ] as [string, number | null | undefined][]).map(([label, val]) => val != null && (
+              <div key={label}>
+                <div className="text-muted-foreground mb-0.5">{label}</div>
+                <div className={`font-mono font-semibold text-base ${val >= 0 ? "text-green-500" : "text-red-500"}`}>
+                  {val >= 0 ? "+" : ""}{val.toFixed(2)}%
+                </div>
+                <div className={`text-xs ${val >= 0 ? "text-green-500" : "text-red-500"}`}>
+                  {val >= 0 ? "Outperforming" : "Underperforming"}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ── Generated at ──────────────────────────────────────────────────── */}
       <p className="text-right text-xs text-muted-foreground/60">

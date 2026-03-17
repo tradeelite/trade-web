@@ -51,15 +51,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const result = await signInWithEmailAndPassword(auth, email, password);
 
-    // Check backend allowlist
-    const res = await fetch(
-      `${BACKEND_URL}/api/users/check?email=${encodeURIComponent(result.user.email ?? "")}`
-    );
-    const data = await res.json();
-
-    if (!data.allowed) {
-      await firebaseSignOut(auth);
-      throw new Error("Your account is not authorized to access this app.");
+    // Check backend allowlist — fail open if backend is unreachable
+    try {
+      const res = await fetch(
+        `${BACKEND_URL}/api/users/check?email=${encodeURIComponent(result.user.email ?? "")}`
+      );
+      if (res.ok) {
+        const data = await res.json().catch(() => ({ allowed: true }));
+        if (data.allowed === false) {
+          await firebaseSignOut(auth);
+          throw new Error("Your account is not authorized to access this app.");
+        }
+      }
+      // non-OK response → backend unavailable → allow login
+    } catch (err: unknown) {
+      // Re-throw explicit authorization denial
+      if (err instanceof Error && err.message.includes("not authorized")) {
+        throw err;
+      }
+      // Network / server error → allow login (fail open)
     }
   }
 

@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Bot, Send, User } from "lucide-react";
+import { Send, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { TeAriaBadge } from "@/components/ai/te-aria-badge";
 
 interface Message {
   role: "user" | "assistant";
@@ -80,7 +81,7 @@ export function AgentChat({ initialPrompt, placeholder, className }: AgentChatPr
       <div className="flex-1 overflow-y-auto space-y-4 p-4">
         {messages.length === 0 && !loading && (
           <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-3 py-12">
-            <Bot className="h-10 w-10" />
+            <TeAriaBadge size="lg" />
             <p className="text-sm">Ask me about your portfolio, options, or any stock.</p>
           </div>
         )}
@@ -94,8 +95,8 @@ export function AgentChat({ initialPrompt, placeholder, className }: AgentChatPr
             )}
           >
             {msg.role === "assistant" && (
-              <div className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                <Bot className="h-4 w-4 text-primary" />
+              <div className="mt-1 shrink-0">
+                <TeAriaBadge size="sm" />
               </div>
             )}
             <div
@@ -117,9 +118,9 @@ export function AgentChat({ initialPrompt, placeholder, className }: AgentChatPr
         ))}
 
         {loading && (
-          <div className="flex gap-3 justify-start">
-            <div className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10">
-              <Bot className="h-4 w-4 text-primary" />
+          <div className="flex gap-3 justify-start items-start">
+            <div className="mt-1 shrink-0">
+              <TeAriaBadge size="sm" />
             </div>
             <div className="space-y-1.5 pt-1">
               <Skeleton className="h-3 w-48" />

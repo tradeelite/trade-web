@@ -157,8 +157,8 @@ export function TechnicalAnalysis({ ticker }: TechnicalAnalysisProps) {
   return (
     <div className="space-y-6">
       <AiInsightBanner ticker={ticker} />
-      <IndicatorChart ticker={ticker} />
       <TechnicalSignalsPanel ticker={ticker} />
+      <IndicatorChart ticker={ticker} />
     </div>
   );
 }
