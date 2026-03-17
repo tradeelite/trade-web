@@ -15,6 +15,13 @@ import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { useDebounce } from "@/hooks/use-debounce";
 import { QUERY_KEYS, STALE_TIMES } from "@/lib/constants";
+import { cn } from "@/lib/utils";
+
+type StockSearchResult = {
+  ticker: string;
+  name: string;
+  exchange: string;
+};
 
 export function SearchCommand() {
   const [open, setOpen] = useState(false);
@@ -33,7 +40,7 @@ export function SearchCommand() {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  const { data: results } = useQuery({
+  const { data: results } = useQuery<StockSearchResult[]>({
     queryKey: QUERY_KEYS.stockSearch(debouncedQuery),
     queryFn: () =>
       fetch(`/api/stocks/search?q=${encodeURIComponent(debouncedQuery)}`).then(
@@ -53,7 +60,9 @@ export function SearchCommand() {
     <>
       <Button
         variant="outline"
-        className="relative w-64 justify-start text-sm text-muted-foreground"
+        className={cn(
+          "relative w-full max-w-[220px] justify-start text-sm text-muted-foreground sm:max-w-xs md:w-64"
+        )}
         onClick={() => setOpen(true)}
       >
         <Search className="mr-2 h-4 w-4" />
@@ -76,7 +85,7 @@ export function SearchCommand() {
           </CommandEmpty>
           {results && Array.isArray(results) && results.length > 0 && (
             <CommandGroup heading="Results">
-              {results.map((r: any, index: number) => (
+              {results.map((r, index) => (
                 <CommandItem
                   key={`${r.ticker}-${r.exchange}-${index}`}
                   value={`${r.ticker} ${r.name}`}

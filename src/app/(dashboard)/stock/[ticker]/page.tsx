@@ -37,7 +37,8 @@ export default function StockDetailPage({
       <StockHeader quote={quote} isLoading={isLoading} />
 
       <Tabs defaultValue="info" className="space-y-4" onValueChange={setActiveTab}>
-        <TabsList>
+        <div className="overflow-x-auto pb-1">
+          <TabsList className="min-w-max">
           <TabsTrigger value="info" className="flex items-center gap-1.5">
             <Building2 className="h-3.5 w-3.5" />
             Company Info
@@ -62,7 +63,8 @@ export default function StockDetailPage({
             <Brain className="h-3.5 w-3.5" />
             AI Analysis
           </TabsTrigger>
-        </TabsList>
+          </TabsList>
+        </div>
         <TabsContent value="info">
           <CompanyInfo ticker={upperTicker} />
         </TabsContent>
