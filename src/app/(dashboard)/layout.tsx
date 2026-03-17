@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
@@ -11,6 +11,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { user, loading } = useAuth();
   const router = useRouter();
 
@@ -29,11 +30,14 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <div className="flex-1 pl-72">
-        <Header />
-        <main className="p-6">{children}</main>
+    <div className="min-h-screen">
+      <Sidebar
+        mobileOpen={mobileNavOpen}
+        onMobileOpenChange={setMobileNavOpen}
+      />
+      <div className="flex min-h-screen flex-col md:pl-72">
+        <Header onOpenMobileNav={() => setMobileNavOpen(true)} />
+        <main className="flex-1 overflow-x-hidden p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );

@@ -3,6 +3,23 @@
 ## Summary
 Next.js frontend for TradeElite. Provides dashboard UI, local data features, and API proxy routes to `trade-backend`.
 
+## Dashboard Shell Responsiveness
+
+- `src/app/(dashboard)/layout.tsx` uses a responsive shell:
+  - Desktop (`md+`): fixed left sidebar + content offset (`md:pl-72`)
+  - Mobile (`<md`): full-width content + sheet/drawer navigation
+- `src/components/layout/sidebar.tsx`:
+  - Desktop sidebar is `hidden md:flex`
+  - Mobile nav uses `Sheet` (`side="left"`) and auto-closes on route navigation
+- `src/components/layout/header.tsx`:
+  - Adds mobile hamburger button (`md:hidden`) to open drawer
+  - Keeps search + actions compact for narrow screens
+- `src/components/layout/search-command.tsx`:
+  - Search trigger is constrained on mobile (`w-full max-w-[220px]`)
+  - Uses typed search result model (`StockSearchResult`)
+- `src/app/(dashboard)/stock/[ticker]/page.tsx`:
+  - Tab bar is wrapped with horizontal scrolling container on mobile (`overflow-x-auto`, `min-w-max`)
+
 ## Stock Detail Page Tabs
 
 Order (left → right) and default tab:

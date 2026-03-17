@@ -2,18 +2,34 @@
 
 import { SearchCommand } from "./search-command";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, LogOut } from "lucide-react";
+import { Moon, Sun, LogOut, Menu } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/context/auth-context";
 import Image from "next/image";
 
-export function Header() {
+type HeaderProps = {
+  onOpenMobileNav?: () => void;
+};
+
+export function Header({ onOpenMobileNav }: HeaderProps) {
   const { theme, setTheme } = useTheme();
   const { user, signOut } = useAuth();
 
   return (
-    <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <SearchCommand />
+    <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b bg-background/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-background/60 sm:px-6">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="md:hidden"
+          onClick={onOpenMobileNav}
+          title="Open navigation"
+        >
+          <Menu className="h-4 w-4" />
+          <span className="sr-only">Open navigation</span>
+        </Button>
+        <SearchCommand />
+      </div>
       <div className="flex items-center gap-2">
         <Button
           variant="ghost"
