@@ -12,6 +12,8 @@ const TA_SECTIONS = [
   { id: "ta-oscillators", label: "Oscillators" },
   { id: "ta-volume", label: "Volume & Volatility" },
   { id: "ta-trend", label: "Trend Strength" },
+  { id: "ta-levels", label: "Key Levels" },
+  { id: "ta-market-context", label: "VIX" },
   { id: "ta-relative-strength", label: "vs S&P 500" },
 ];
 
@@ -96,6 +98,20 @@ interface TechnicalSignals {
     relativeStrength1M?: number | null;
     relativeStrength3M?: number | null;
     relativeStrength6M?: number | null;
+  };
+  supportResistance?: {
+    support: number | null;
+    resistance: number | null;
+    support2?: number | null;
+    resistance2?: number | null;
+  };
+  marketContext?: {
+    vix?: {
+      value: number | null;
+      changePercent: number | null;
+      status: "complacent" | "normal" | "elevated";
+      signal: "Buy" | "Sell" | "Neutral";
+    };
   };
   snapshot: {
     fiftyTwoWeekHigh: number | null;
@@ -274,6 +290,8 @@ export function TechnicalSignalsPanel({ ticker }: { ticker: string }) {
   }
 
   const { composite, movingAverages, oscillators, volume, volatility, trendStrength, snapshot } = data;
+  const levels = data.supportResistance;
+  const vix = data.marketContext?.vix;
   const maOsc = composite.movingAverages;
   const oscComp = composite.oscillators;
 
@@ -508,6 +526,58 @@ export function TechnicalSignalsPanel({ ticker }: { ticker: string }) {
           </div>
         )}
       </div>
+
+      {/* ── Key Support / Resistance ─────────────────────────────────────── */}
+      {levels && (levels.support != null || levels.resistance != null || levels.support2 != null || levels.resistance2 != null) && (
+        <div id="ta-levels" className="scroll-mt-32 rounded-xl border border-border/60 bg-card p-4 space-y-3">
+          <h3 className="text-sm font-semibold">Support &amp; Resistance Levels</h3>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+            <div className="rounded-lg bg-muted/40 p-3">
+              <p className="text-muted-foreground">Support (20D)</p>
+              <p className="mt-1 font-mono font-semibold text-green-500">
+                {levels.support != null ? `$${levels.support.toFixed(2)}` : "—"}
+              </p>
+            </div>
+            <div className="rounded-lg bg-muted/40 p-3">
+              <p className="text-muted-foreground">Resistance (20D)</p>
+              <p className="mt-1 font-mono font-semibold text-red-500">
+                {levels.resistance != null ? `$${levels.resistance.toFixed(2)}` : "—"}
+              </p>
+            </div>
+            <div className="rounded-lg bg-muted/40 p-3">
+              <p className="text-muted-foreground">Support (50D)</p>
+              <p className="mt-1 font-mono font-semibold text-green-500">
+                {levels.support2 != null ? `$${levels.support2.toFixed(2)}` : "—"}
+              </p>
+            </div>
+            <div className="rounded-lg bg-muted/40 p-3">
+              <p className="text-muted-foreground">Resistance (50D)</p>
+              <p className="mt-1 font-mono font-semibold text-red-500">
+                {levels.resistance2 != null ? `$${levels.resistance2.toFixed(2)}` : "—"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Market Context: VIX ──────────────────────────────────────────── */}
+      {vix && (
+        <div id="ta-market-context" className="scroll-mt-32 rounded-xl border border-border/60 bg-card p-4 space-y-2">
+          <h3 className="text-sm font-semibold">Market Volatility (VIX)</h3>
+          <div className="flex flex-wrap items-center gap-4 text-xs">
+            <span className="text-muted-foreground">VIX</span>
+            <span className="font-mono font-semibold text-base">{vix.value != null ? vix.value.toFixed(2) : "—"}</span>
+            <span className={`font-mono ${vix.changePercent != null && vix.changePercent >= 0 ? "text-red-500" : "text-green-500"}`}>
+              {vix.changePercent != null ? `${vix.changePercent >= 0 ? "+" : ""}${vix.changePercent.toFixed(2)}%` : "—"}
+            </span>
+            <span className="rounded-full bg-muted px-2.5 py-0.5 capitalize text-muted-foreground">{vix.status}</span>
+            <SignalBadge signal={vix.signal} />
+          </div>
+          <p className="text-xs text-muted-foreground">
+            VIX above 25 indicates elevated market stress; below 15 often signals calm risk appetite.
+          </p>
+        </div>
+      )}
 
       {/* ── Relative Strength vs S&P 500 ──────────────────────────────────── */}
       {(trendStrength.relativeStrength1M != null || trendStrength.relativeStrength3M != null || trendStrength.relativeStrength6M != null) && (

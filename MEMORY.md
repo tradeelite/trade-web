@@ -37,6 +37,10 @@
 - Settings page behavior:
   - Admin users can manage allowlist and global data provider setting
   - Demo/regular users see settings in read-only scope for admin controls
+- Stock page analytics extensions:
+  - Added Social Media tab (`/social-analysis`)
+  - Added Macro Impact tab (`/macro-analysis`)
+  - Technical tab now includes Support/Resistance and VIX market context sections
 
 ## Known Gaps
 

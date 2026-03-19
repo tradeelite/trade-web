@@ -4,6 +4,14 @@
 - [2026-03-12] Improve visual differentiation between legacy and deep fundamental modes in UI.
 
 ## Completed
+- [2026-03-17] Added Social Media and Macro Impact stock tabs
+  - New `SocialAnalysisTab` backed by `/api/stocks/{ticker}/social-analysis`
+  - New `MacroAnalysisTab` backed by `/api/stocks/{ticker}/macro-analysis`
+  - Updated stock tab bar and TEARIA context mapping for `social` and `macro`
+- [2026-03-17] Technical Analysis tab enhancements
+  - Added dedicated `Support & Resistance` section (20D and 50D levels)
+  - Added `VIX` market context section
+  - Extended section jump bar with new anchors
 - [2026-03-17] Role-aware Settings page (admin vs demo/regular users)
   - Added `/api/users/me` role check usage in settings page
   - Data Provider control is now disabled for non-admin users (read-only)

@@ -31,7 +31,9 @@ Order (left → right) and default tab:
 | 3 | Fundamental AI | `fundamental-ai` | `BarChart3` | |
 | 4 | Technical Analysis | `technical` | `Activity` | |
 | 5 | News & Sentiment | `news` | `Newspaper` | |
-| 6 | AI Analysis | `ai` | `Brain` | |
+| 6 | Social Media | `social` | `MessagesSquare` | |
+| 7 | Macro Impact | `macro` | `Globe` | |
+| 8 | AI Analysis | `ai` | `Brain` | |
 
 File: `src/app/(dashboard)/stock/[ticker]/page.tsx`
 
@@ -41,6 +43,8 @@ File: `src/app/(dashboard)/stock/[ticker]/page.tsx`
 - `fundamental-ai` → `<FundamentalAnalysisTab>` — calls `/api/stocks/{ticker}/fundamental-analysis`
 - `technical` → `<TechnicalAnalysis>` — renders `AiInsightBanner` → `TechnicalSignalsPanel` → `IndicatorChart`
 - `news` → `<NewsAnalysisTab>` — calls `/api/stocks/{ticker}/news-analysis`
+- `social` → `<SocialAnalysisTab>` — calls `/api/stocks/{ticker}/social-analysis`
+- `macro` → `<MacroAnalysisTab>` — calls `/api/stocks/{ticker}/macro-analysis`
 - `ai` → `<StockAnalysisPanel>` — calls `/api/stocks/{ticker}/ai-analysis`
 
 ## API Proxy Routes
@@ -48,6 +52,8 @@ File: `src/app/(dashboard)/stock/[ticker]/page.tsx`
 - `/api/stocks/[ticker]/ai-analysis` → backend full orchestrated analysis
 - `/api/stocks/[ticker]/fundamental-analysis` → backend dedicated deep fundamental analysis
 - `/api/stocks/[ticker]/news-analysis` → caught by catch-all proxy → backend news synthesis
+- `/api/stocks/[ticker]/social-analysis` → caught by catch-all proxy → backend social sentiment analyst
+- `/api/stocks/[ticker]/macro-analysis` → caught by catch-all proxy → backend macro regime analyst
 - `/api/stocks/[ticker]/technical-signals` → caught by catch-all proxy → backend technical signals
 - `/api/*` catch-all proxy now forwards `x-user-email` from `te_user_email` cookie for user-owned backend routes (`portfolios`, `options`)
 

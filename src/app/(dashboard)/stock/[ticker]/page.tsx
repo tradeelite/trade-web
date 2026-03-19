@@ -9,10 +9,12 @@ import { CompanyInfo } from "@/components/stock/company-info";
 import { PriceChartWrapper } from "@/components/stock/price-chart-wrapper";
 import { TechnicalAnalysis } from "@/components/technical/technical-analysis";
 import { NewsAnalysisTab } from "@/components/stock/news-analysis-tab";
+import { SocialAnalysisTab } from "@/components/stock/social-analysis-tab";
+import { MacroAnalysisTab } from "@/components/stock/macro-analysis-tab";
 import { StockAnalysisPanel } from "@/components/stock/ai-analysis/stock-analysis-panel";
 import { FundamentalAnalysisTab } from "@/components/stock/ai-analysis/fundamental-analysis-tab";
 import { StockTearia } from "@/components/ai/stock-tearia";
-import { Building2, LineChart, BarChart3, Activity, Newspaper, Brain } from "lucide-react";
+import { Building2, LineChart, BarChart3, Activity, Newspaper, Brain, MessagesSquare, Globe } from "lucide-react";
 import { QUERY_KEYS, STALE_TIMES } from "@/lib/constants";
 
 export default function StockDetailPage({
@@ -59,6 +61,14 @@ export default function StockDetailPage({
             <Newspaper className="h-3.5 w-3.5" />
             News & Sentiment
           </TabsTrigger>
+          <TabsTrigger value="social" className="flex items-center gap-1.5">
+            <MessagesSquare className="h-3.5 w-3.5" />
+            Social Media
+          </TabsTrigger>
+          <TabsTrigger value="macro" className="flex items-center gap-1.5">
+            <Globe className="h-3.5 w-3.5" />
+            Macro Impact
+          </TabsTrigger>
           <TabsTrigger value="ai" className="flex items-center gap-1.5">
             <Brain className="h-3.5 w-3.5" />
             AI Analysis
@@ -80,6 +90,12 @@ export default function StockDetailPage({
         </TabsContent>
         <TabsContent value="news">
           <NewsAnalysisTab ticker={upperTicker} />
+        </TabsContent>
+        <TabsContent value="social">
+          <SocialAnalysisTab ticker={upperTicker} />
+        </TabsContent>
+        <TabsContent value="macro">
+          <MacroAnalysisTab ticker={upperTicker} />
         </TabsContent>
         <TabsContent value="ai">
           <StockAnalysisPanel ticker={upperTicker} />

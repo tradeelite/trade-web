@@ -142,6 +142,33 @@ function serializeTabData(tab: string, data: unknown): string {
       return lines.join("\n");
     }
 
+    if (tab === "social") {
+      const lines: string[] = ["--- Social Media Sentiment ---"];
+      if (d.overallSentiment) lines.push(`Overall social sentiment: ${d.overallSentiment}`);
+      if (d.metrics) {
+        const m = d.metrics as Record<string, unknown>;
+        if (m.bullishPercent != null) lines.push(`Bullish: ${m.bullishPercent}%`);
+        if (m.bearishPercent != null) lines.push(`Bearish: ${m.bearishPercent}%`);
+      }
+      if (d.analyst) {
+        const a = d.analyst as Record<string, unknown>;
+        lines.push(`Recommendation: ${a.recommendation ?? "Hold"} (${a.confidence ?? "medium"})`);
+        if (a.summary) lines.push(`Analyst Summary: ${a.summary}`);
+      }
+      return lines.join("\n");
+    }
+
+    if (tab === "macro") {
+      const lines: string[] = ["--- Macro Impact ---"];
+      if (d.regime) lines.push(`Regime: ${d.regime}`);
+      if (d.analyst) {
+        const a = d.analyst as Record<string, unknown>;
+        lines.push(`Recommendation: ${a.recommendation ?? "Hold"} (${a.confidence ?? "medium"})`);
+        if (a.summary) lines.push(`Macro Summary: ${a.summary}`);
+      }
+      return lines.join("\n");
+    }
+
     if (tab === "ai") {
       const lines: string[] = ["--- AI Analysis ---"];
       if (d.summary) lines.push(`Summary: ${d.summary}`);
@@ -184,7 +211,7 @@ export function StockTearia({ ticker, companyName, currentTab, quote }: StockTea
   const inputRef = useRef<HTMLInputElement>(null);
 
   const tabLabel = currentTab
-    ? ({ chart: "Chart", technical: "Technical Analysis", "fundamental-ai": "Fundamental AI", news: "News & Sentiment", ai: "AI Analysis", info: "Company Info" } as Record<string, string>)[currentTab] ?? currentTab
+    ? ({ chart: "Chart", technical: "Technical Analysis", "fundamental-ai": "Fundamental AI", news: "News & Sentiment", social: "Social Media", macro: "Macro Impact", ai: "AI Analysis", info: "Company Info" } as Record<string, string>)[currentTab] ?? currentTab
     : null;
 
   const send = async (text: string, silent = false) => {
@@ -246,6 +273,8 @@ export function StockTearia({ ticker, companyName, currentTab, quote }: StockTea
         technical: queryClient.getQueryData(QUERY_KEYS.stockTechnicalSignals(ticker)),
         "fundamental-ai": queryClient.getQueryData(QUERY_KEYS.stockFundamentalAnalysis(ticker)),
         news: queryClient.getQueryData(QUERY_KEYS.stockNewsAnalysis(ticker)),
+        social: queryClient.getQueryData(QUERY_KEYS.stockSocialAnalysis(ticker)),
+        macro: queryClient.getQueryData(QUERY_KEYS.stockMacroAnalysis(ticker)),
         ai: queryClient.getQueryData(QUERY_KEYS.stockAnalysis(ticker)),
         info: queryClient.getQueryData(QUERY_KEYS.stockSummary(ticker)),
       };
