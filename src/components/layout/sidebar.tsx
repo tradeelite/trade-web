@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3,
   Briefcase,
+  Database,
   Home,
   Settings,
 } from "lucide-react";
@@ -15,6 +16,7 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: Home },
+  { href: "/data-viewer", label: "Market Data", icon: Database },
   { href: "/portfolio", label: "Portfolios", icon: Briefcase },
   { href: "/options", label: "Options", icon: BarChart3 },
   { href: "/settings", label: "Settings", icon: Settings },

@@ -31,6 +31,8 @@ type SocialAnalysisData = {
     stocktwits: { available: boolean; bullishPercent: number | null; messageCount: number };
     reddit: { available: boolean; bullishPercent: number | null; postCount: number };
     twitter: { available: boolean; note: string };
+    facebook?: { available: boolean; note: string };
+    supplementalContext?: { available: boolean; used: boolean; headlineCount: number };
   };
   trendingTopics: string[];
   analyst: {
@@ -41,6 +43,7 @@ type SocialAnalysisData = {
     risks: string[];
   };
   posts: SocialPost[];
+  supplementalContext?: SocialPost[];
   asOf: string;
 };
 
@@ -124,6 +127,37 @@ export function SocialAnalysisTab({ ticker }: { ticker: string }) {
         </CardContent>
       </Card>
 
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <Card>
+          <CardHeader><CardTitle className="text-base">StockTwits</CardTitle></CardHeader>
+          <CardContent className="space-y-1 text-sm text-muted-foreground">
+            <p>{data.sources.stocktwits.messageCount} messages</p>
+            <p>{data.sources.stocktwits.bullishPercent != null ? `${data.sources.stocktwits.bullishPercent}% bullish` : "No tagged sentiment"}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader><CardTitle className="text-base">Reddit</CardTitle></CardHeader>
+          <CardContent className="space-y-1 text-sm text-muted-foreground">
+            <p>{data.sources.reddit.postCount} posts</p>
+            <p>{data.sources.reddit.bullishPercent != null ? `${data.sources.reddit.bullishPercent}% bullish` : "No tagged sentiment"}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader><CardTitle className="text-base">X / Twitter</CardTitle></CardHeader>
+          <CardContent className="space-y-1 text-sm text-muted-foreground">
+            <p>Not connected</p>
+            <p>{data.sources.twitter.note}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader><CardTitle className="text-base">Facebook</CardTitle></CardHeader>
+          <CardContent className="space-y-1 text-sm text-muted-foreground">
+            <p>Not connected</p>
+            <p>{data.sources.facebook?.note ?? "Facebook data source not configured."}</p>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader><CardTitle className="text-base flex items-center gap-2"><TrendingUp className="h-4 w-4 text-green-500" />Catalysts</CardTitle></CardHeader>
@@ -155,6 +189,11 @@ export function SocialAnalysisTab({ ticker }: { ticker: string }) {
           <CardTitle className="text-base flex items-center gap-2"><MessageCircle className="h-4 w-4" />Recent Social Posts</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
+          {data.posts.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              No direct posts available from connected social sources for this ticker right now.
+            </p>
+          )}
           {data.posts.slice(0, 12).map((p, i) => (
             <a key={i} href={p.url} target="_blank" rel="noopener noreferrer" className="block rounded-lg border p-3 hover:bg-muted/40 transition-colors">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -173,6 +212,35 @@ export function SocialAnalysisTab({ ticker }: { ticker: string }) {
           ))}
         </CardContent>
       </Card>
+
+      {data.supplementalContext && data.supplementalContext.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Supplemental Market Context</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              These headlines provide supporting context when direct social coverage is thin. They are not treated as direct social posts.
+            </p>
+            {data.supplementalContext.slice(0, 6).map((p, i) => (
+              <a key={i} href={p.url} target="_blank" rel="noopener noreferrer" className="block rounded-lg border p-3 hover:bg-muted/40 transition-colors">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="font-semibold text-foreground">{p.source}</span>
+                  <span>@{p.user || "unknown"}</span>
+                  {p.createdAt && (
+                    <>
+                      <span>·</span>
+                      <span>{formatDistanceToNow(new Date(typeof p.createdAt === "number" ? p.createdAt * 1000 : p.createdAt), { addSuffix: true })}</span>
+                    </>
+                  )}
+                  {p.sentiment && <span className="ml-auto capitalize">{p.sentiment}</span>}
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{p.text}</p>
+              </a>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
